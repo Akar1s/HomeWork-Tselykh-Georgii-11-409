@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>My_homepage</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="forecast">
+        <div class="temp">--°</div>
+        <div class="city">Kazan</div>
+    </div>
+    <div class="centre_block">
+        <div class="dial">
+            <div class="clock">--:--:--</div>
+            <div class="hello">Good Morning, Geogii.</div>
+        </div>
+        <div class="search">
+            <form class="search_line" action="https://www.google.com/search" method="GET" target="_blank">
+                <span class="search_icon"> 
+                    <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.9058 20.2754L24.5725 24.9421" stroke="#BDBDBD" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22.2391 13.2753C22.2391 8.12069 18.0605 3.94202 12.9058 3.94202C7.75112 3.94202 3.57245 8.12069 3.57245 13.2753C3.57245 18.43 7.75112 22.6087 12.9058 22.6087C18.0605 22.6087 22.2391 18.43 22.2391 13.2753Z" stroke="#BDBDBD" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <input type="text" name="q" class="search_input" placeholder="Search">
+            </form>
+
+            <ul class="icons">
+                <li class="icon"><img src="icons/youtube.png" alt="YouTube"></li>
+                <li class="icon"><img src="icons/gpt.png" alt="ChatGPT"></li>
+                <li class="icon"><img src="icons/gg.png" alt="Google"></li>
+                <li class="icon"><img src="icons/deepseek.png" alt="DeepSeek"></li>
+                <li class="icon"><img src="icons/github.png" alt="GitHub"></li>
+                <li class="icon"><img src="icons/in.png" alt="LinkedIn"></li>
+                <li class="icon"><img src="icons/plus.png" alt="Add"></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.querySelector('.clock').textContent = timeString;
+        
+        updateGreeting(now.getHours());
+    }
+
+    function updateGreeting(hour) {
+        const greetingElement = document.querySelector('.hello');
+        let greeting;
+
+        if (hour < 12) greeting = 'Good Morning';
+        else if (hour < 18) greeting = 'Good Afternoon';
+        else greeting = 'Good Evening';
+
+        greetingElement.innerHTML = `${greeting}, <span class="name">Geogii</span>.`;
+    }
+
+    async function getWeatherByLocation(latitude, longitude, cityName = 'Kazan') {
+        try {
+            const response = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&timezone=auto`
+            );
+            const data = await response.json();
+            
+            if (data.current) {
+                const temperature = Math.round(data.current.temperature_2m);
+                document.querySelector('.temp').textContent = `${temperature}°`;
+                document.querySelector('.city').textContent = cityName;
+            }
+        } catch (error) {
+            console.log('Ошибка загрузки погоды:', error);
+            document.querySelector('.city').textContent = 'Kazan';
+            document.querySelector('.temp').textContent = '--°';
+        }
+    }
+
+    async function getLocationByIP() {
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            
+            if (data.latitude && data.longitude && data.city) {
+                getWeatherByLocation(data.latitude, data.longitude, data.city);
+            } else {
+                useDefaultLocation();
+            }
+        } catch (error) {
+            console.log('Ошибка определения местоположения:', error);
+            useDefaultLocation();
+        }
+    }
+
+    function useDefaultLocation() {
+        const kazanLat = 55.7961;
+        const kazanLon = 49.1064;
+        getWeatherByLocation(kazanLat, kazanLon, 'Kazan');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.city').textContent = 'Kazan';
+        document.querySelector('.temp').textContent = '--°';
+        
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        getLocationByIP();
+        
+        setInterval(getLocationByIP, 30 * 60 * 1000);
+    });
+    </script>
+</body>
+</html>
