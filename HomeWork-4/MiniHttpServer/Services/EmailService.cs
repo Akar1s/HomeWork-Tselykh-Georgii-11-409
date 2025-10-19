@@ -17,8 +17,8 @@ namespace MiniHttpServer.Services
                     Host = "smtp.yandex.ru",
                     Port = 587,
                     EnableSsl = true,
-                    Username = "S1nhao@yandex.ru",
-                    Password = "eoacfzceeeyjfkkc"
+                    Username = "************", // вставьте почту с которой будети идти сообщение (@yandex.ru)
+                    Password = "***********" // вставьте начтоящий пароль приложения
                 }
             };
         }
@@ -92,3 +92,4 @@ http://localhost:1337/reset-password
         }
     }
 }
+
